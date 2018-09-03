@@ -50,7 +50,7 @@ function getReplays() {
                         player2_legend_rank,
                         player2_rank,
                         player2_won: player2_won === 'True',
-                        player2_class_name: play1_arch.player_class_name,
+                        player2_class_name: play2_arch.player_class_name,
                         player2_arch_url: 'https://hsreplay.net/' + play2_arch.url,
                     };
 
@@ -59,22 +59,20 @@ function getReplays() {
 
                 // Save to mongodb
                 mongo.getInstance(client => {
-                    client.db('local').collection('replays').insertMany(results, function (e, o) {
-                        if (e) {
-                            console.log('insert error', e);
-                            reject(e);
-                            return;
-                        }
-                        console.log('insert success');
-                        resolve(results);
+                    results.forEach(r => {
+                        client.db('local').collection('replays').update({_id: r.id}, r, {upsert: true}, function (e, o) {
+                            if (e) {
+                                console.log('insert error', e);
+                                reject(e);
+                                return;
+                            }
+                        });
                     });
                 });
             });
         });
     });
 }
-
-getReplays();
 
 module.exports = {
     start(interval) {
