@@ -21,7 +21,7 @@ function MongoPool() {}
 var p_db;
 
 function initPool(cb){
-    MongoClient.connect(url, option, function(err, db) {
+    MongoClient.connect(url, function(err, db) {
         if (err) {
             throw err;
         }

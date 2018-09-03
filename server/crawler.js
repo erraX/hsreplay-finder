@@ -1,4 +1,5 @@
 const request = require('request');
+const mongo = require('./mongo');
 
 const api = {
     replays: 'https://hsreplay.net/api/v1/live/replay_feed',
@@ -14,9 +15,10 @@ function findInArray(arr, predict) {
 }
 
 function getReplays() {
-    return new Promise((resolve) => {
-        let results = [];
+    return new Promise((resolve, reject) => {
+        console.log('start crawl replays');
         request(api.replays, function (error, response, body) {
+            let results = [];
             const replays = JSON.parse(body).data;
             request(api.archetypes, function (error, response, body) {
                 const arches = JSON.parse(body);
@@ -34,6 +36,7 @@ function getReplays() {
                     const play1_arch = findInArray(arches, a => a.id == player1_archetype);
                     const play2_arch = findInArray(arches, a => a.id == player2_archetype);
                     const item = {
+                        _id: id,
                         id,
                         add_time: Date.now(),
                         url: 'https://hsreplay.net/replay/' + id,
@@ -50,14 +53,39 @@ function getReplays() {
                         player2_class_name: play1_arch.player_class_name,
                         player2_arch_url: 'https://hsreplay.net/' + play2_arch.url,
                     };
-                    console.log(item);
+
                     results.push(item);
+                });
+
+                // Save to mongodb
+                mongo.getInstance(client => {
+                    client.db('local').collection('replays').insertMany(results, function (e, o) {
+                        if (e) {
+                            console.log('insert error', e);
+                            reject(e);
+                            return;
+                        }
+                        console.log('insert success');
+                        resolve(results);
+                    });
                 });
             });
         });
     });
 }
 
-module.exports = function start(interval) {
-    setInterval(() => getReplays(), interval);
-}
+getReplays();
+
+module.exports = {
+    start(interval) {
+        setInterval(() => {
+            getReplays()
+                .then(() => {
+                    console.log('Fetch replay success');
+                })
+                .catch(err => {
+                    console.log('Fetch replay error', err);
+                })
+        }, interval);
+    }
+};
