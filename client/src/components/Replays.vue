@@ -80,6 +80,7 @@
                         </span>
                         <span class="normal rank-badge" v-if="r.player1_legend_rank === 'None'">R{{r.player1_rank}}</span>
                         <span class="legend rank-badge" v-else>L{{r.player1_legend_rank}}</span>
+                        <span class="time">{{getTimeAgo(r.add_time)}}</span>
                     </div>
                   </a>
               </li>
@@ -90,6 +91,7 @@
 
 <script>
 import axios from 'axios';
+import timeAgo from 'node-time-ago';
 
 export default {
     name: 'Replays',
@@ -99,7 +101,7 @@ export default {
                 won: false,
                 archetypeName: 'ALL',
                 className: 'ALL',
-                isLegend: true,
+                isLegend: false,
                 rankStart: 1,
                 rankEnd: 25,
             },
@@ -136,6 +138,9 @@ export default {
         }
     },
     methods: {
+        getTimeAgo(time) {
+            return timeAgo(time);
+        },
         onSubmit() {
             this.getReplays();
         },
@@ -144,7 +149,7 @@ export default {
                 lock: true,
                 spinner: 'el-icon-loading'
             });
-            axios.get('http://localhost:8888/archetype', {params: {
+            axios.get('http://23.225.182.85:8888/archetype', {params: {
                 className: this.filters.className
             }})
                 .then(res => {
@@ -164,7 +169,7 @@ export default {
                 lock: true,
                 spinner: 'el-icon-loading'
             });
-            axios.get('http://localhost:8888/replays', {params: this.filters})
+            axios.get('http://23.225.182.85:8888/replays', {params: this.filters})
                 .then(res => {
                     loading.close();
                     this.replays = res.data.data;
@@ -192,7 +197,7 @@ export default {
 }
 
 .replay-list {
-    width: 580px;
+    width: 620px;
 }
 
 .replay-item {
@@ -244,5 +249,10 @@ export default {
     &.legend {
         background-color: #ff9143;
     }
+}
+
+.time {
+    margin-left: 20px;
+    font-size: 12px;
 }
 </style>
