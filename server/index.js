@@ -24,6 +24,10 @@ app.use(function(err, req, res, next) {
     next(err);
 });
 
+app.get('/replays', (req, res, next) => {
+    const {rank, won, archetypeName, className} = req.query;
+});
+
 // start crawler
 crawler.start(60 * 1000);
 
