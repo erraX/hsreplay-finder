@@ -18,10 +18,24 @@ function getReplays() {
     return new Promise((resolve, reject) => {
         console.log('start crawl replays');
         request(api.replays, function (error, response, body) {
+            if (error) {
+                return;
+            }
             let results = [];
-            const replays = JSON.parse(body).data;
+            let replays = [];
+            try {
+                replays = JSON.parse(body).data;
+            }
+            catch (ex) {}
             request(api.archetypes, function (error, response, body) {
-                const arches = JSON.parse(body);
+                if (error) {
+                    return;
+                }
+                let arches = [];
+                try {
+                    arches = JSON.parse(body);
+                }
+                catch (ex) {}
                 replays.forEach(({
                     id,
                     player1_archetype,
