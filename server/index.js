@@ -10,19 +10,18 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
+// app.use((req, res, next) => {
+//     res.header("Access-Control-Allow-Origin", "*");
+//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//     next();
+// });
 
-app.get('/replays', (req, res, next) => {
-    let {rankStart, rankEnd, isLegend, won, archetypeName, className} = req.query;
+app.get('/api/replays', (req, res, next) => { let {rankStart, rankEnd, isLegend, won, archetypeName, className} = req.query;
     rankStart = parseInt(rankStart);
     rankEnd = parseInt(rankEnd);
     console.log('/replays query', req.query);
     mongo.getInstance(client => {
-        client.db('local').collection('replays').find({}).toArray((err, result) => {
+        client.db('local').collection('replays').find({}).sort({add_time: -1}).toArray((err, result) => {
             if (err) {
                 throw err;
             }
@@ -53,16 +52,16 @@ app.get('/replays', (req, res, next) => {
             if (archetypeName !== 'ALL') {
                 result = result.filter(r => r.player2_archetype_name === archetypeName);
             }
-
+            res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
             res.json({
                 code: 200,
-                data: result
+                data: result.slice(0, 50)
             });
         })
     });
 });
 
-app.get('/archetype', (req, res, next) => {
+app.get('/api/archetype', (req, res, next) => {
     const {className} = req.query;
     console.log('/archetypes query', req.query);
     mongo.getInstance(client => {

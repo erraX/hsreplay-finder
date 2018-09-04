@@ -149,7 +149,7 @@ export default {
                 lock: true,
                 spinner: 'el-icon-loading'
             });
-            axios.get('http://23.225.182.85:8888/archetype', {params: {
+            axios.get('/api/archetype', {params: {
                 className: this.filters.className
             }})
                 .then(res => {
@@ -169,7 +169,7 @@ export default {
                 lock: true,
                 spinner: 'el-icon-loading'
             });
-            axios.get('http://23.225.182.85:8888/replays', {params: this.filters})
+            axios.get('/api/replays', {params: this.filters})
                 .then(res => {
                     loading.close();
                     this.replays = res.data.data;
