@@ -112,7 +112,7 @@ export default {
                 {label: '法师', value: "MAGE"},
                 {label: '圣骑士', value: "PALADIN"},
                 {label: '牧师', value: "PRIEST"},
-                {label: '潜行者', value: "ROUGE"},
+                {label: '潜行者', value: "ROGUE"},
                 {label: '萨满', value: "SHAMAN"},
                 {label: '术士', value: "WARLOCK"},
                 {label: '战士', value: "WARRIOR"},
