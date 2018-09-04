@@ -158,7 +158,7 @@ export default {
                         label: d,
                         value: d
                     }));
-                    this.archetypeOptions.unshift({label: '所有', value: '所有'});
+                    this.archetypeOptions.unshift({label: '所有', value: 'ALL'});
                 })
                 .catch(() => {
                     loading.close();
