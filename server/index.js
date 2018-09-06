@@ -26,11 +26,6 @@ app.get('/api/replays', (req, res, next) => { let {rankStart, rankEnd, isLegend,
                 throw err;
             }
 
-            // Filter won
-            if (won === 'true') {
-                result = result.filter(r => r.player2_won);
-            }
-
             // Filter rank
             if (isLegend === 'true') {
                 result = result.filter(r => r.player2_legend_rank !== 'None');
@@ -52,6 +47,16 @@ app.get('/api/replays', (req, res, next) => { let {rankStart, rankEnd, isLegend,
             if (archetypeName !== 'ALL') {
                 result = result.filter(r => r.player2_archetype_name === archetypeName || r.player1_archetype_name === archetypeName);
             }
+
+            // Filter won
+            // 选择套牌时才有意义
+            if (won === 'true' && archetypeName !== 'ALL') {
+                result = result.filter(r => 
+                    (r.player2_archetype_name === archetypeName && r.player2_won)
+                        || (r.player1_archetype_name === archetypeName && r.player1_won)
+                );
+            }
+
             res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
             res.json({
                 code: 200,
