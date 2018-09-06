@@ -1,6 +1,10 @@
 const request = require('request');
 const mongo = require('./mongo');
 
+process.on('uncaughtException', err => {
+    console.log('uncaughtException', err);
+});
+
 const api = {
     replays: 'https://hsreplay.net/api/v1/live/replay_feed',
     archetypes: 'https://hsreplay.net/api/v1/archetypes'
@@ -16,10 +20,10 @@ function findInArray(arr, predict) {
 
 function getReplays() {
     return new Promise((resolve, reject) => {
-        console.log('start crawl replays');
+        console.log('start crawl replays...');
         request(api.replays, function (error, response, body) {
             if (error) {
-                return;
+                return reject(error);
             }
             let results = [];
             let replays = [];
@@ -29,13 +33,9 @@ function getReplays() {
             catch (ex) {}
             request(api.archetypes, function (error, response, body) {
                 if (error) {
-                    return;
+                    return reject(error);
                 }
-                let arches = [];
-                try {
-                    arches = JSON.parse(body);
-                }
-                catch (ex) {}
+                const arches = JSON.parse(body);
                 replays.forEach(({
                     id,
                     player1_archetype,
