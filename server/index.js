@@ -46,11 +46,11 @@ app.get('/api/replays', (req, res, next) => { let {rankStart, rankEnd, isLegend,
 
             // Filter className and archeType
             if (className !== 'ALL') {
-                result = result.filter(r => r.player2_class_name === className);
+                result = result.filter(r => r.player2_class_name === className || r.player1_class_name === className);
             }
 
             if (archetypeName !== 'ALL') {
-                result = result.filter(r => r.player2_archetype_name === archetypeName);
+                result = result.filter(r => r.player2_archetype_name === archetypeName || r.player1_archetype_name === archetypeName);
             }
             res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
             res.json({
