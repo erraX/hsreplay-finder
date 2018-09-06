@@ -68,6 +68,10 @@ function getReplays() {
                         player2_arch_url: 'https://hsreplay.net/' + play2_arch.url,
                     };
 
+                    if (player1_legend_rank === 'None' && parseInt(item.player1_rank) > 5) {
+                        return;
+                    }
+
                     results.push(item);
                 });
 
