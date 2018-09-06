@@ -41,14 +41,14 @@
                     v-if="!filters.isLegend"
                     v-model="filters.rankStart"
                     :min="1"
-                    :max="25"
+                    :max="5"
                 ></el-input-number>
                 <el-input-number
                     class="rank-input"
                     v-if="!filters.isLegend"
                     v-model="filters.rankEnd"
                     :min="1"
-                    :max="25"
+                    :max="5"
                 ></el-input-number>
                 <el-form-item>
                     <el-button type="primary" @click="onSubmit">查询</el-button>
