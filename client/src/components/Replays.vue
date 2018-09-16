@@ -176,13 +176,16 @@ export default {
                 });
         },
         getReplays(mode) {
-            const loading = this.$loading({
-                lock: true,
-                spinner: 'el-icon-loading'
-            });
+            let loading;
+            if (mode !== 'append') {
+                loading = this.$loading({
+                    lock: true,
+                    spinner: 'el-icon-loading'
+                });
+            }
             return axios.get('/hs/replays', {params: this.filters})
                 .then(res => {
-                    loading.close();
+                    loading && loading.close();
                     if (mode === 'append') {
                         this.replays = this.replays.concat(res.data.data);
                     }
@@ -191,7 +194,7 @@ export default {
                     }
                 })
                 .catch(() => {
-                    loading.close();
+                    loading && loading.close();
                 });
         }
     }
