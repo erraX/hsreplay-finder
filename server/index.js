@@ -16,9 +16,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //     next();
 // });
 
-app.get('/api/replays', (req, res, next) => { let {rankStart, rankEnd, isLegend, won, archetypeName, className} = req.query;
+app.get('/hs/replays', (req, res, next) => {
+    let {rankStart, rankEnd, isLegend, won, archetypeName, className, pageNo} = req.query;
+    pageNo = parseInt(pageNo);
     rankStart = parseInt(rankStart);
     rankEnd = parseInt(rankEnd);
+    const pageSize = 20;
     console.log('/replays query', req.query);
     mongo.getInstance(client => {
         client.db('local').collection('replays').find({}).sort({add_time: -1}).toArray((err, result) => {
@@ -55,13 +58,13 @@ app.get('/api/replays', (req, res, next) => { let {rankStart, rankEnd, isLegend,
             res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
             res.json({
                 code: 200,
-                data: result.slice(0, 50)
+                data: result.slice((pageNo - 1) * pageSize, pageNo * pageSize)
             });
         })
     });
 });
 
-app.get('/api/archetype', (req, res, next) => {
+app.get('/hs/archetype', (req, res, next) => {
     const {className} = req.query;
     console.log('/archetypes query', req.query);
     mongo.getInstance(client => {

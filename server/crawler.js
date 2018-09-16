@@ -1,6 +1,10 @@
 const request = require('request');
 const mongo = require('./mongo');
 
+process.on('uncaughtException', err => {
+    console.log('uncaughtException', err);
+});
+
 const api = {
     replays: 'https://hsreplay.net/api/v1/live/replay_feed',
     archetypes: 'https://hsreplay.net/api/v1/archetypes'

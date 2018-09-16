@@ -41,19 +41,19 @@
                     v-if="!filters.isLegend"
                     v-model="filters.rankStart"
                     :min="1"
-                    :max="25"
+                    :max="5"
                 ></el-input-number>
                 <el-input-number
                     class="rank-input"
                     v-if="!filters.isLegend"
                     v-model="filters.rankEnd"
                     :min="1"
-                    :max="25"
+                    :max="5"
                 ></el-input-number>
-                <el-form-item>
-                    <el-button type="primary" @click="onSubmit">查询</el-button>
-                </el-form-item>
             </el-form-item>
+            <div class="btn-container">
+                <el-button class="submit" type="primary" @click="onSubmit">查询</el-button>
+            </div>
           </el-form>
       </div>
       <div class="replay-list">
@@ -69,8 +69,8 @@
                             {{r.player2_archetype_name}}
                             <!-- <a :href="r.player2_archurl" class="arch&#45;link" target="_blank">查看套牌</a> -->
                         </span>
-                        <span class="normal rank-badge" v-if="r.player2_legend_rank === 'None'">R{{r.player2_rank}}</span>
-                        <span class="legend rank-badge" v-else>L{{r.player2_legend_rank}}</span>
+                        <span class="normal rank-badge" v-if="r.player2_legend_rank === 'None'">{{r.player2_rank}}</span>
+                        <span class="legend rank-badge" v-else>{{r.player2_legend_rank}}</span>
                     </div>
                     <span class="vs">vs</span>
                     <div :class="['player', {won: r.player1_won}]">
@@ -78,13 +78,14 @@
                             {{r.player1_archetype_name}}
                             <!-- <a :href="r.player1_archurl" class="arch&#45;link" target="_blank">查看套牌</a> -->
                         </span>
-                        <span class="normal rank-badge" v-if="r.player1_legend_rank === 'None'">R{{r.player1_rank}}</span>
-                        <span class="legend rank-badge" v-else>L{{r.player1_legend_rank}}</span>
+                        <span class="normal rank-badge" v-if="r.player1_legend_rank === 'None'">{{r.player1_rank}}</span>
+                        <span class="legend rank-badge" v-else>{{r.player1_legend_rank}}</span>
                         <span class="time">{{getTimeAgo(r.add_time)}}</span>
                     </div>
                   </a>
               </li>
           </ul>
+          <infinite-loading @infinite="infiniteHandler"></infinite-loading>
       </div>
   </div>
 </template>
@@ -92,9 +93,11 @@
 <script>
 import axios from 'axios';
 import timeAgo from 'node-time-ago';
+import InfiniteLoading from 'vue-infinite-loading';
 
 export default {
     name: 'Replays',
+    components: {InfiniteLoading},
     data () {
         return {
             filters: {
@@ -104,6 +107,7 @@ export default {
                 isLegend: false,
                 rankStart: 1,
                 rankEnd: 25,
+                pageNo: 1
             },
             classNameOptions: [
                 {label: '所有', value: "ALL"},
@@ -138,10 +142,17 @@ export default {
         }
     },
     methods: {
+        infiniteHandler($state) {
+            console.log('state', $state);
+            this.filters.pageNo++;
+            this.getReplays('append')
+                .then(() => $state.loaded());
+        },
         getTimeAgo(time) {
             return timeAgo(time);
         },
         onSubmit() {
+            this.filters.pageNo = 1;
             this.getReplays();
         },
         getArchOptions() {
@@ -149,7 +160,7 @@ export default {
                 lock: true,
                 spinner: 'el-icon-loading'
             });
-            axios.get('/api/archetype', {params: {
+            axios.get('/hs/archetype', {params: {
                 className: this.filters.className
             }})
                 .then(res => {
@@ -164,15 +175,20 @@ export default {
                     loading.close();
                 });
         },
-        getReplays() {
+        getReplays(mode) {
             const loading = this.$loading({
                 lock: true,
                 spinner: 'el-icon-loading'
             });
-            axios.get('/api/replays', {params: this.filters})
+            return axios.get('/hs/replays', {params: this.filters})
                 .then(res => {
                     loading.close();
-                    this.replays = res.data.data;
+                    if (mode === 'append') {
+                        this.replays = this.replays.concat(res.data.data);
+                    }
+                    else {
+                        this.replays = res.data.data;
+                    }
                 })
                 .catch(() => {
                     loading.close();
@@ -197,7 +213,8 @@ export default {
 }
 
 .replay-list {
-    width: 620px;
+    width: 660px;
+    margin-top: 20px;
 }
 
 .replay-item {
@@ -248,6 +265,12 @@ export default {
 
     &.legend {
         background-color: #ff9143;
+    }
+}
+
+.btn-container {
+    .submit {
+        margin-left: 44px;
     }
 }
 

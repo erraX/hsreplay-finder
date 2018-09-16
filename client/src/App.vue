@@ -1,14 +1,5 @@
 <template>
   <div id="app">
-    <nav class="navigation">
-        <el-menu default-active="1">
-            <h1>HsReplays</h1>
-            <el-menu-item index="1">
-                <i class="el-icon-menu"></i>
-                <span slot="title">HsReplays</span>
-            </el-menu-item>
-        </el-menu>
-    </nav>
     <router-view class="main" />
   </div>
 </template>
@@ -61,7 +52,11 @@ a {
     }
 }
 
+#app {
+    width: 637px;
+    margin: auto;
+}
+
 .main {
-    margin-left: 270px;
 }
 </style>
