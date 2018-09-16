@@ -20,10 +20,10 @@ function findInArray(arr, predict) {
 
 function getReplays() {
     return new Promise((resolve, reject) => {
-        console.log('start crawl replays');
+        console.log('start crawl replays...');
         request(api.replays, function (error, response, body) {
             if (error) {
-                return;
+                return reject(error);
             }
             let results = [];
             let replays = [];
@@ -33,13 +33,9 @@ function getReplays() {
             catch (ex) {}
             request(api.archetypes, function (error, response, body) {
                 if (error) {
-                    return;
+                    return reject(error);
                 }
-                let arches = [];
-                try {
-                    arches = JSON.parse(body);
-                }
-                catch (ex) {}
+                const arches = JSON.parse(body);
                 replays.forEach(({
                     id,
                     player1_archetype,
@@ -71,6 +67,10 @@ function getReplays() {
                         player2_class_name: play2_arch.player_class_name,
                         player2_arch_url: 'https://hsreplay.net/' + play2_arch.url,
                     };
+
+                    if (player1_legend_rank === 'None' && parseInt(item.player1_rank) > 5) {
+                        return;
+                    }
 
                     results.push(item);
                 });

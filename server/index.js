@@ -29,11 +29,6 @@ app.get('/hs/replays', (req, res, next) => {
                 throw err;
             }
 
-            // Filter won
-            if (won === 'true') {
-                result = result.filter(r => r.player2_won);
-            }
-
             // Filter rank
             if (isLegend === 'true') {
                 result = result.filter(r => r.player2_legend_rank !== 'None');
@@ -49,12 +44,22 @@ app.get('/hs/replays', (req, res, next) => {
 
             // Filter className and archeType
             if (className !== 'ALL') {
-                result = result.filter(r => r.player2_class_name === className);
+                result = result.filter(r => r.player2_class_name === className || r.player1_class_name === className);
             }
 
             if (archetypeName !== 'ALL') {
-                result = result.filter(r => r.player2_archetype_name === archetypeName);
+                result = result.filter(r => r.player2_archetype_name === archetypeName || r.player1_archetype_name === archetypeName);
             }
+
+            // Filter won
+            // 选择套牌时才有意义
+            if (won === 'true' && archetypeName !== 'ALL') {
+                result = result.filter(r => 
+                    (r.player2_archetype_name === archetypeName && r.player2_won)
+                        || (r.player1_archetype_name === archetypeName && r.player1_won)
+                );
+            }
+
             res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
             res.json({
                 code: 200,
